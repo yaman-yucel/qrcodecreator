@@ -4,14 +4,6 @@ import { CameraControls } from './CameraControls';
 import { TreeBlocks } from './TreeBlocks';
 import { ErrorBoundary } from './ErrorBoundary';
 
-/**
- * QRTreeScene
- * The main Three.js canvas.
- *
- * Props:
- *   matrix:  number[][]
- *   preset:  'isometric' | 'front' | 'side'
- */
 export function QRTreeScene({ matrix, preset }) {
   return (
     <ErrorBoundary>
@@ -19,7 +11,7 @@ export function QRTreeScene({ matrix, preset }) {
         shadows="basic"
         dpr={[1, 1.5]}
         camera={{ position: [40, 35, 40], fov: 45, near: 0.1, far: 500 }}
-        style={{ background: '#0f0f0f' }}
+        style={{ background: '#ffffff' }}
         gl={{
           antialias: true,
           alpha: false,
@@ -27,14 +19,13 @@ export function QRTreeScene({ matrix, preset }) {
           failIfMajorPerformanceCaveat: false,
         }}
         onCreated={({ gl }) => {
-          gl.setClearColor('#0f0f0f', 1);
+          gl.setClearColor('#ffffff', 1);
         }}
       >
-        {/* Lighting */}
-        <ambientLight intensity={0.7} />
+        <ambientLight intensity={1.0} />
         <directionalLight
           position={[25, 50, 25]}
-          intensity={1.4}
+          intensity={1.6}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
@@ -45,20 +36,19 @@ export function QRTreeScene({ matrix, preset }) {
           shadow-camera-top={50}
           shadow-camera-bottom={-50}
         />
-        <directionalLight position={[-20, 30, -20]} intensity={0.5} />
-        <hemisphereLight skyColor="#ffe0f0" groundColor="#1a1a2e" intensity={0.4} />
+        <directionalLight position={[-20, 30, -20]} intensity={0.6} />
+        <hemisphereLight skyColor="#ffffff" groundColor="#e0e0e0" intensity={0.5} />
 
-        {/* Fog for depth */}
-        <fog attach="fog" args={['#0f0f0f', 60, 200]} />
+        <fog attach="fog" args={['#ffffff', 80, 250]} />
 
         <Suspense fallback={null}>
           {matrix && matrix.length > 0 && <TreeBlocks matrix={matrix} />}
         </Suspense>
 
-        {/* Ground plane */}
+        {/* Ground plane — light gray so it's visible against white bg */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
           <planeGeometry args={[200, 200]} />
-          <meshStandardMaterial color="#1a1a1a" roughness={1} />
+          <meshStandardMaterial color="#f0f0f0" roughness={1} />
         </mesh>
 
         <CameraControls preset={preset} />
