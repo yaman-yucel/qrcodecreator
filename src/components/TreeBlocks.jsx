@@ -11,6 +11,7 @@ const COLOR_GROUPS = [
   { key: 'brown',     color: '#8B4513' },
   { key: 'pink',      color: '#FF69B4' },
   { key: 'lightpink', color: '#FFB6C1' },
+  { key: 'fringe',    color: '#FFD1E8' },
 ];
 
 /** Round a colour hex string to the nearest colour-group key */
@@ -21,6 +22,7 @@ function colorToKey(color) {
     '#8B4513': 'brown',
     '#FF69B4': 'pink',
     '#FFB6C1': 'lightpink',
+    '#FFD1E8': 'fringe',
   };
   return map[color] ?? 'green';
 }
@@ -50,13 +52,13 @@ export function TreeBlocks({ matrix }) {
       const rowData = matrix[row];
       for (let col = 0; col < (rowData?.length ?? 0); col++) {
         const isDark = rowData[col] === 1;
-        const { height, color } = getBlockProps(row, col, size, isDark);
+        const { yBase, height, color } = getBlockProps(row, col, size, isDark);
         const key = colorToKey(color);
 
-        // X/Z centred around origin, Y starts at 0
         const x = col - cx;
         const z = row - cz;
-        const y = height / 2; // box origin is at centre
+        // y is the centre of the box: base + half height
+        const y = yBase + height / 2;
 
         buckets[key].push({ x, y, z, height, color });
       }
