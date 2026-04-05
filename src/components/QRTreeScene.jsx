@@ -4,7 +4,7 @@ import { CameraControls } from './CameraControls';
 import { TreeBlocks } from './TreeBlocks';
 import { ErrorBoundary } from './ErrorBoundary';
 
-export function QRTreeScene({ matrix, preset }) {
+export function QRTreeScene({ matrix, preset, style = 'cherry', theme = 'cherry' }) {
   return (
     <ErrorBoundary>
       <Canvas
@@ -42,7 +42,7 @@ export function QRTreeScene({ matrix, preset }) {
         <fog attach="fog" args={['#ffffff', 80, 250]} />
 
         <Suspense fallback={null}>
-          {matrix && matrix.length > 0 && <TreeBlocks matrix={matrix} />}
+          {matrix && matrix.length > 0 && <TreeBlocks matrix={matrix} style={style} theme={theme} />}
         </Suspense>
 
         {/* Ground plane — light gray so it's visible against white bg */}

@@ -3,6 +3,8 @@ import { QRTreeScene } from './components/QRTreeScene';
 import { FlatCodeView } from './components/FlatCodeView';
 import { generateQRMatrix } from './utils/qrMatrix';
 import { generateDataMatrix } from './utils/dataMatrixGen';
+import { THEME_LABELS } from './utils/themes';
+import { STYLE_LABELS } from './utils/treeStyles';
 
 const DEFAULT_TEXT = 'https://example.com';
 
@@ -11,6 +13,8 @@ export default function App() {
   const [committedText, setCommittedText] = useState(DEFAULT_TEXT);
   const [codeType, setCodeType] = useState('qr');
   const [preset, setPreset] = useState('isometric');
+  const [theme, setTheme] = useState('cherry');
+  const [treeStyle, setTreeStyle] = useState('cherry');
   const [matrix, setMatrix] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -124,6 +128,39 @@ export default function App() {
           </div>
         </div>
 
+        {/* ── Theme & Style pickers ── */}
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+          <span className="text-xs text-gray-400 self-center mr-1">Theme</span>
+          {Object.entries(THEME_LABELS).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTheme(key)}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
+                theme === key
+                  ? 'bg-pink-600 text-white border-pink-600 shadow-sm'
+                  : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+          <div className="w-px bg-gray-200 mx-1 hidden sm:block" />
+          <span className="text-xs text-gray-400 self-center mr-1">Style</span>
+          {Object.entries(STYLE_LABELS).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTreeStyle(key)}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
+                treeStyle === key
+                  ? 'bg-pink-600 text-white border-pink-600 shadow-sm'
+                  : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         {error && <p className="text-red-500 text-xs">⚠ {error}</p>}
       </header>
 
@@ -153,7 +190,7 @@ export default function App() {
         {matrix && (
           isFlatView
             ? <FlatCodeView matrix={matrix} />
-            : <QRTreeScene matrix={matrix} preset={preset} />
+            : <QRTreeScene matrix={matrix} preset={preset} style={treeStyle} theme={theme} />
         )}
       </div>
 

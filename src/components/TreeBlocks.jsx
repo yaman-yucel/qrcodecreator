@@ -4,81 +4,49 @@ import { getBlockProps } from '../utils/treeHeightMap';
 
 const BOX_WIDTH = 0.9;
 
-// Color groups used to build separate InstancedMeshes
-const COLOR_GROUPS = [
-  { key: 'white',     color: '#f5f0e8' },
-  { key: 'green',     color: '#3a7d44' },
-  { key: 'brown',     color: '#8B4513' },
-  { key: 'pink',      color: '#FF69B4' },
-  { key: 'lightpink', color: '#FFB6C1' },
-  { key: 'fringe',    color: '#FFD1E8' },
-];
-
-/** Round a colour hex string to the nearest colour-group key */
-function colorToKey(color) {
-  const map = {
-    '#f5f0e8': 'white',
-    '#3a7d44': 'green',
-    '#8B4513': 'brown',
-    '#FF69B4': 'pink',
-    '#FFB6C1': 'lightpink',
-    '#FFD1E8': 'fringe',
-  };
-  return map[color] ?? 'green';
-}
-
 /**
  * TreeBlocks
  * Renders the entire QR/DataMatrix grid as coloured 3-D boxes using
- * one InstancedMesh per colour group for good GPU performance.
+ * one InstancedMesh per unique colour for good GPU performance.
  *
  * Props:
  *   matrix: number[][]   - binary 2-D array (1=dark, 0=light)
+ *   style:  string       - tree style key (cherry | pine | oak | bonsai)
+ *   theme:  string       - color theme key (cherry | autumn | winter | tropical | golden | neon)
  */
-export function TreeBlocks({ matrix }) {
-  // Build per-group instance data
+export function TreeBlocks({ matrix, style = 'cherry', theme = 'cherry' }) {
   const groups = useMemo(() => {
-    if (!matrix || matrix.length === 0) return {};
+    if (!matrix || matrix.length === 0) return new Map();
 
-    const size = matrix.length; // assume square
+    const size = matrix.length;
     const cx = (size - 1) / 2;
     const cz = (size - 1) / 2;
 
-    // Collect instances per colour group
-    const buckets = {};
-    COLOR_GROUPS.forEach(({ key }) => { buckets[key] = []; });
+    // Collect instances per unique colour
+    const buckets = new Map();
 
     for (let row = 0; row < size; row++) {
       const rowData = matrix[row];
       for (let col = 0; col < (rowData?.length ?? 0); col++) {
         const isDark = rowData[col] === 1;
-        const { yBase, height, color } = getBlockProps(row, col, size, isDark);
-        const key = colorToKey(color);
+        const { yBase, height, color } = getBlockProps(row, col, size, isDark, style, theme);
 
         const x = col - cx;
         const z = row - cz;
-        // y is the centre of the box: base + half height
         const y = yBase + height / 2;
 
-        buckets[key].push({ x, y, z, height, color });
+        if (!buckets.has(color)) buckets.set(color, []);
+        buckets.get(color).push({ x, y, z, height });
       }
     }
     return buckets;
-  }, [matrix]);
+  }, [matrix, style, theme]);
 
   return (
     <>
-      {COLOR_GROUPS.map(({ key, color }) => {
-        const instances = groups[key] ?? [];
-        if (instances.length === 0) return null;
-        return (
-          <ColorGroup
-            key={key}
-            color={color}
-            instances={instances}
-          />
-        );
-      })}
+      {[...groups.entries()].map(([color, instances]) => (
+        <ColorGroup key={color} color={color} instances={instances} />
+      ))}
     </>
   );
 }
@@ -87,8 +55,6 @@ export function TreeBlocks({ matrix }) {
 function ColorGroup({ color, instances }) {
   const meshRef = useRef();
 
-  // Build geometries for each unique height
-  // For simplicity, use one geometry per group with height = 1 and scale Y per instance
   useEffect(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
