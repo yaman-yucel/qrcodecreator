@@ -6,18 +6,18 @@ import * as THREE from 'three';
 // Preset camera positions
 export const CAMERA_PRESETS = {
   isometric: {
-    position: new THREE.Vector3(30, 30, 30),
-    target: new THREE.Vector3(0, 0, 0),
+    position: new THREE.Vector3(40, 38, 40),
+    target: new THREE.Vector3(0, 5, 0),
   },
   front: {
-    // Top-down view (looking straight down = QR code visible)
-    position: new THREE.Vector3(0, 60, 0.001),
+    // Top-down view — QR code visible
+    position: new THREE.Vector3(0, 70, 0.001),
     target: new THREE.Vector3(0, 0, 0),
   },
   side: {
-    // Side view – see the tree silhouette
-    position: new THREE.Vector3(60, 15, 0),
-    target: new THREE.Vector3(0, 0, 0),
+    // Side view — tree silhouette, aim at canopy centre
+    position: new THREE.Vector3(70, 14, 0),
+    target: new THREE.Vector3(0, 8, 0),
   },
 };
 

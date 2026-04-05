@@ -18,7 +18,7 @@ export function QRTreeScene({ matrix, preset }) {
       <Canvas
         shadows="basic"
         dpr={[1, 1.5]}
-        camera={{ position: [30, 30, 30], fov: 45, near: 0.1, far: 500 }}
+        camera={{ position: [40, 35, 40], fov: 45, near: 0.1, far: 500 }}
         style={{ background: '#0f0f0f' }}
         gl={{
           antialias: true,
